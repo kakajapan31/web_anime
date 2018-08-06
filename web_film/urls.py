@@ -1,8 +1,9 @@
 from django.urls import  path
 from web_film import  views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
-    path('', views.Book_list_view.as_view(), name='index'),
+    path('', views.Film_list_view.as_view(), name='index'),
     path('help/', views.Help.as_view(), name='help'),
     path('about_me/', views.About_me.as_view(), name='about_me'),
     path('login/', views.Login.as_view(), name='login'),

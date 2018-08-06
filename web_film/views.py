@@ -8,16 +8,27 @@ from django.contrib.auth import login as auth_login, logout as auth_logout, auth
 from django.contrib import  messages
 from django.contrib.auth.models import User
 from .models import Question, Choice
-from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from .models import *
 
 def logout(request):
     auth_logout(request)
     messages.info(request, "See you later!")
     return redirect('index')
 
-class Book_list_view(generic.TemplateView):
+class Film_list_view(generic.ListView):
     template_name = 'web_film/index.html'
+    context_object_name = 'list_film'
+    model = Phim
 
+    def get_queryset(self, *, objects_list=None, **kwargs):
+        if 'search' in self.request.GET:
+            query = self.request.GET['search']
+            return Phim.objects.filter(ten_phim__icontains=query)
+        return Phim.objects.all()[:8]
+
+@method_decorator(login_required, name='dispatch')
 class Help(generic.TemplateView):
     template_name = 'web_film/help.html'
 
@@ -29,6 +40,10 @@ class Help(generic.TemplateView):
             messages.error(request, "You have not asked me :(")
         return redirect('help')
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
 class About_me(generic.TemplateView):
     template_name = 'web_film/about_me.html'
 
@@ -38,14 +53,20 @@ class Login(generic.TemplateView):
     def post(self, request):
         username = request.POST['username']
         password = request.POST['password']
+        next = request.GET.get('next', 'index')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             auth_login(request, user)
             messages.info(request, "Welcome " + user.first_name + " " + user.last_name + " to come back ")
-            return redirect('index')
+            return redirect(next)
         else:
             messages.error(request, 'Username or password not correct, please try again.')
-            return redirect('login')
+            return redirect(request.get_full_path())
+
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('index')
+        return super().dispatch(*args, **kwargs)
 
 class Register(generic.TemplateView):
     template_name = 'web_film/register.html'
@@ -79,9 +100,20 @@ class Register(generic.TemplateView):
             messages.info(request, "Welcome new member " + user.first_name + " " + user.last_name)
             return redirect('index')
 
+    def dispatch(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('index')
+        return super().dispatch(*args, **kwargs)
+
+@method_decorator(login_required, name='dispatch')
 class My_account(generic.TemplateView):
     template_name = 'web_film/my_account.html'
 
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+@method_decorator(login_required, name='dispatch')
 class Change_password(generic.TemplateView):
     template_name = 'web_film/change_password.html'
 
@@ -109,6 +141,10 @@ class Change_password(generic.TemplateView):
         user = authenticate(request=request, username=user.username, password=password1)
         auth_login(request, user)
         return redirect('change_password')
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
 
 class Forgot_password(generic.TemplateView):
     template_name = 'web_film/forgot_password.html'
@@ -139,6 +175,11 @@ class Question_view(generic.DetailView):
     model = Question
     context_object_name = 'question'
 
+    def dispatch(self, request, pk):
+        if pk > Question.objects.count():
+            messages.error(request, "{}{}{}".format("I just have ", Question.objects.count(), " questions"))
+            return  redirect('index')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['count'] = Question.objects.count()
@@ -156,8 +197,4 @@ class Question_view(generic.DetailView):
         else:
             messages.error(request, "Wrong answer :(")
             return redirect('question', pk)
-
-
-
-
 
