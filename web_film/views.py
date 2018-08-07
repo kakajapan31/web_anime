@@ -11,6 +11,7 @@ from .models import Question, Choice
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from .models import *
+from .forms import CommentForm
 
 def logout(request):
     auth_logout(request)
@@ -27,6 +28,61 @@ class Film_list_view(generic.ListView):
             query = self.request.GET['search']
             return Phim.objects.filter(ten_phim__icontains=query)
         return Phim.objects.all()[:8]
+
+class Film_view(generic.DetailView):
+    model = Phim
+    template_name = "web_film/film_detail.html"
+    context_object_name = 'film'
+    form_class = CommentForm
+
+    def post(self, request, pk):
+        if request.POST.get('watch'):
+            film_now = self.get_object()
+            film_now.luot_xem += 1
+            film_now.save()
+            return redirect('film', pk)
+
+        if request.POST.get('noi_dung'):
+            self.object = self.get_object()
+            form = CommentForm(request.POST, user=request.user, film=self.object,
+                               noi_dung=request.POST['noi_dung'])
+            if form.is_valid():
+                form.save()
+                messages.success(request, "just autofocus for comment!")
+                return redirect('film', pk)
+            else:
+                messages.error(request, "You have not comment!")
+                return redirect('film', pk)
+
+class Author_view(generic.DetailView):
+    model = Dao_dien
+    template_name = 'web_film/author.html'
+    context_object_name = 'author'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['list_film'] = Phim.objects.filter(dao_dien__in=[self.object])
+        return context
+
+class Actor_view(generic.DetailView):
+    model = Dien_vien
+    template_name = 'web_film/actor.html'
+    context_object_name = 'actor'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['list_film'] = Phim.objects.filter(dien_vien__in=[self.object])
+        return context
+
+class Genre_view(generic.DetailView):
+     model = The_loai
+     template_name = 'web_film/genre.html'
+     context_object_name = 'genre'
+
+     def get_context_data(self, **kwargs):
+         context = super().get_context_data(**kwargs)
+         context['list_film'] = Phim.objects.filter(the_loai__in=[self.object])
+         return context
 
 @method_decorator(login_required, name='dispatch')
 class Help(generic.TemplateView):

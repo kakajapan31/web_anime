@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}
+        Đạo diễn: {{ author.ten_tac_gia }}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-4">
+                <img src="{{ author.hinh.url }}" width="80%" height="350px">
+            </div>
+            <div class="col-sm-8">
+                <h1>{{ author }}</h1>
+                <h4>Sinh năm {{ author.nam_sinh }} tại {{ author.quoc_gia }}</h4>
+                <h4>Chiều cao: {{ author.chieu_cao }} </h4>
+                <h4>Sở trường: {{ author.so_truong }} </h4>
+                <h4>Sở thích: {{ author.so_thich }}   </h4>
+                <h4>
+                    Các thể loại:
+                    {% for genre in author.the_loai.all %}
+                        <a href="#">{{ genre.ten_the_loai }}</a>
+                        {% if genre != author.the_loai.all.last %}, {% endif %}
+                    {% endfor %}
+                </h4>
+            </div>
+        </div>
+        <br>
+        <br>
+        <h2>Phim của {{ author.ten_tac_gia }}</h2>
+        <div class="grid-container">
+        {% for film in list_film %}
+            <div class="grid-item">
+                <center>
+                    <a href="{% url 'film' film.ma_phim %}"><img src="{{ film.hinh.url }}" class="custom-center" height="300px" width="230px"></a>
+                    <a href="{% url 'film' film.ma_phim %}"><h4 style="width: 250px;">{{ film.ten_phim }}</h4></a>
+                </center>
+            </div>
+        {% endfor %}
+    </div>
+    </div>
+{% endblock %}

@@ -1,4 +1,4 @@
-from django.urls import  path
+from django.urls import path
 from web_film import  views
 from django.contrib.auth import views as auth_views
 
@@ -13,4 +13,8 @@ urlpatterns = [
     path('change_password/',  views.Change_password.as_view(), name='change_password'),
     path('forgot_password/', views.Forgot_password.as_view(), name='forgot_password'),
     path('question/<int:pk>/', views.Question_view.as_view(), name='question'),
+    path('film/<int:pk>/', views.Film_view.as_view(), name='film'),
+    path('author/<int:pk>/', views.Author_view.as_view(), name='author'),
+    path('actor/<int:pk>/', views.Actor_view.as_view(), name='actor'),
+    path('genre/<int:pk>/', views.Genre_view.as_view(), name='genre'),
 ]

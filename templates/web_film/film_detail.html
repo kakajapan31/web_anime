@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}
+        Phim: {{ film.ten_phim }}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-4">
+                <img src="{{ film.hinh.url }}" width="80%", height="350px">
+                <div class="pull-left">
+                <ul class="nav navbar-nav" >
+                    <form class="actions" method="post">
+                        {% csrf_token %}
+                        <li><a href="#">
+                            <input class="btn btn-lg btn-primary btn-block" type="submit" name="watch" value="Xem phim"/>
+                        </a></li>
+                    </form>
+                </ul>
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <h1>{{ film.ten_phim }}</h1>
+                <h4>
+                    Đạo diễn:
+                    {% for author in film.dao_dien.all %}
+                        <a href="{% url 'author' author.ma_tac_gia %}">{{ author }}</a>
+                        {% if author != film.dao_dien.all.last %}, {% endif %}
+                    {% endfor %}
+                </h4>
+                <h4>
+                    Diễn viên:
+                    {% for actor in film.dien_vien.all %}
+                        <a href="{% url 'actor' actor.ma_dien_vien %}">{{ actor }}</a>
+                        {% if actor != film.dien_vien.all.last %}, {% endif %}
+                    {% endfor %}
+                </h4>
+                <h4>
+                    Thể loại:
+                    {% for genre in film.the_loai.all %}
+                        <a href="{% url 'genre' genre.ma_the_loai %}">{{ genre.ten_the_loai }}</a>
+                        {% if genre != film.the_loai.all.last %}, {% endif %}
+                    {% endfor %}
+                </h4>
+                <h4>Quốc gia: {{ film.quoc_gia }}</h4>
+                <h4>Số tập: {{ film.so_tap }}</h4>
+                <h4>Thời lượng: {{ film.thoi_luong }}</h4>
+                <h4>Lượt xem: {{ film.luot_xem }}</h4>
+            </div>
+        </div>
+        <hr>
+        <h4><strong>Nội dung phim:</strong></h4>
+        <p>{{ film.mo_ta|linebreaks }}</p>
+    <hr>
+    <div class="row">
+        <div class="col-sm-10">
+        <h3>Nhận xét:</h3>
+            {% for comment in film.nhan_xet.all %}
+            <div class="media-body">
+                <div class="well well-lg">
+                <p>
+                    <h4 class="media-heading text-uppercase reviews"> {{ comment.user.first_name }} {{ comment.user.last_name }} </h4>
+                </p>
+                    <ul class="media-date text-uppercase reviews list-inline border-right">
+                        <li>{{ comment.ngay_dang }}</li>
+                    </ul>
+                    <p class="media-comment">
+                        {{ comment.noi_dung|linebreaks }}
+                    </p>
+                </div>
+            </div>
+            <br>
+            {% endfor %}
+            {% if user.is_authenticated %}
+                {% for message in messages %}
+                    {% if message.tags == "error" %}
+                        <div class="alert alert-warning">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <form action="{% url 'film' film.ma_phim %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="exampleTextarea">Thêm nhận xét</label>
+                        {% if messages %}
+                            <textarea autofocus class="form-control" id="noi_dung" name="noi_dung" rows="3" placeholder="Thêm nhận xét"></textarea>
+                        {% else %}
+                            <textarea class="form-control" id="noi_dung" name="noi_dung" rows="3" placeholder="Thêm nhận xét"></textarea>
+                        {% endif %}
+                    </div>
+                    <br>
+                    <input type="submit" class="btn btn-default" value="Comment"/>
+                    <hr>
+                </form>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

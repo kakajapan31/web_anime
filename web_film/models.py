@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from time import timezone
 
 # Create your models here.
 
@@ -65,13 +64,21 @@ class Phim(models.Model):
     thoi_luong = models.CharField(max_length=20)
     so_tap = models.IntegerField(default=1)
     luot_xem = models.IntegerField(default=0)
-    url = models.URLField()
     the_loai = models.ManyToManyField(The_loai)
     dao_dien = models.ManyToManyField(Dao_dien)
     dien_vien = models.ManyToManyField(Dien_vien)
 
     def __str__(self):
         return self.ten_phim
+
+class Tap_phim(models.Model):
+    ma_tap = models.AutoField(primary_key=True)
+    tap_thu = models.IntegerField(default=1)
+    phim = models.ForeignKey(Phim, on_delete=models.CASCADE)
+    url = models.URLField()
+
+    def __str__(self):
+        return self.phim.ten_phim + " tap " + self.tap_thu
 
 class Nhan_xet(models.Model):
     phim = models.ForeignKey(Phim, on_delete=models.CASCADE, db_column='phim', related_name='nhan_xet', null=True)

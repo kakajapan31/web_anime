@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Thể loại: {{ genre.ten_the_loai }}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-4">
+                <img src="{{ genre.hinh.url }}" width="80%" height="350px">
+            </div>
+            <div class="col-sm-8">
+                <h1>{{ genre }}</h1>
+                <h4><strong>Chi tiết thể loại {{ genre.ten_the_loai.lower }}:</strong></h4>
+                <p>{{ genre.mo_ta|linebreaks }}</p>
+            </div>
+        </div>
+        <br>
+        <br>
+        <h2>Những bộ phim thuộc thể loại {{ genre.ten_the_loai.lower }}: </h2>
+        <div class="grid-container">
+        {% for film in list_film %}
+            <div class="grid-item">
+                <center>
+                    <a href="{% url 'film' film.ma_phim %}"><img src="{{ film.hinh.url }}" class="custom-center" height="300px" width="230px"></a>
+                    <a href="{% url 'film' film.ma_phim %}"><h4 style="width: 250px;">{{ film.ten_phim }}</h4></a>
+                </center>
+            </div>
+        {% endfor %}
+    </div>
+    </div>
+{% endblock %}
