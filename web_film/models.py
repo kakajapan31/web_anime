@@ -78,7 +78,7 @@ class Tap_phim(models.Model):
     url = models.URLField()
 
     def __str__(self):
-        return self.phim.ten_phim + " tap " + self.tap_thu
+        return self.phim.ten_phim + " tap " + str(self.tap_thu)
 
 class Nhan_xet(models.Model):
     phim = models.ForeignKey(Phim, on_delete=models.CASCADE, db_column='phim', related_name='nhan_xet', null=True)

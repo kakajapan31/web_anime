@@ -19,7 +19,7 @@
                 <h4>
                     Các thể loại:
                     {% for genre in author.the_loai.all %}
-                        <a href="#">{{ genre.ten_the_loai }}</a>
+                        <a href="{% url 'genre' genre.ma_the_loai %}">{{ genre.ten_the_loai }}</a>
                         {% if genre != author.the_loai.all.last %}, {% endif %}
                     {% endfor %}
                 </h4>
@@ -27,7 +27,7 @@
         </div>
         <br>
         <br>
-        <h2>Phim của {{ author.ten_tac_gia }}</h2>
+        <h2>Phim của {{ author.ten_tac_gia }}:</h2>
         <div class="grid-container">
         {% for film in list_film %}
             <div class="grid-item">

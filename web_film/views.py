@@ -40,7 +40,8 @@ class Film_view(generic.DetailView):
             film_now = self.get_object()
             film_now.luot_xem += 1
             film_now.save()
-            return redirect('film', pk)
+            print(film_now.tap_phim_set.first().ma_tap)
+            return redirect('film_page', film_now.tap_phim_set.first().ma_tap)
 
         if request.POST.get('noi_dung'):
             self.object = self.get_object()
@@ -83,6 +84,18 @@ class Genre_view(generic.DetailView):
          context = super().get_context_data(**kwargs)
          context['list_film'] = Phim.objects.filter(the_loai__in=[self.object])
          return context
+
+class Film_page_view(generic.DetailView):
+    template_name = 'web_film/film_page.html'
+    model = Tap_phim
+    context_object_name = 'number_of_film'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        film = self.object.phim
+        context['list_film'] = film.tap_phim_set.all().order_by('tap_thu')
+        context['film'] = film
+        return context
 
 @method_decorator(login_required, name='dispatch')
 class Help(generic.TemplateView):

@@ -19,8 +19,8 @@
                 <h4>
                     Các thể loại:
                     {% for genre in actor.the_loai.all %}
-                        <a href="#">{{ genre.ten_the_loai }}</a>
-                        {% if genre != author.the_loai.all.last %}, {% endif %}
+                        <a href="{% url 'genre' genre.ma_the_loai %}">{{ genre.ten_the_loai }}</a>
+                        {% if genre != actor.the_loai.all.last %}, {% endif %}
                     {% endfor %}
                 </h4>
             </div>

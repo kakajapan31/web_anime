@@ -9,15 +9,16 @@
         <div class="row">
             <div class="col-sm-4">
                 <img src="{{ film.hinh.url }}" width="80%", height="350px">
+                <br><br>
                 <div class="pull-left">
-                <ul class="nav navbar-nav" >
-                    <form class="actions" method="post">
-                        {% csrf_token %}
-                        <li><a href="#">
-                            <input class="btn btn-lg btn-primary btn-block" type="submit" name="watch" value="Xem phim"/>
-                        </a></li>
-                    </form>
-                </ul>
+                    <ul class="nav navbar-nav" >
+                        <form class="actions" method="post">
+                            {% csrf_token %}
+                            <li><a href="{% url 'film_page' film.tap_phim_set.first.ma_tap %}">
+                                <input class="btn btn-lg btn-primary btn-block" type="submit" name="watch" value="Xem phim"/>
+                            </a></li>
+                        </form>
+                    </ul>
                 </div>
             </div>
             <div class="col-sm-8">

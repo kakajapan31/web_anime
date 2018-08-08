@@ -17,4 +17,5 @@ urlpatterns = [
     path('author/<int:pk>/', views.Author_view.as_view(), name='author'),
     path('actor/<int:pk>/', views.Actor_view.as_view(), name='actor'),
     path('genre/<int:pk>/', views.Genre_view.as_view(), name='genre'),
+    path('film_view/<int:pk>', views.Film_page_view.as_view(), name='film_page')
 ]

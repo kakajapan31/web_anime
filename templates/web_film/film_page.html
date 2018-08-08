@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Phim: {{ number_of_film }}
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="col-sm-12">
+            <iframe src="{{ number_of_film.url }}" allowfullscreen width="100%", height="600px"></iframe>
+        </div>
+    </div>
+    <ul class="nav navbar-nav">
+        {% if list_film.count > 1 %}
+            {% for tap_phim in list_film %}
+                <li><a href="{% url 'film_page' tap_phim.ma_tap %}">
+                    {% if number_of_film == tap_phim %}
+                        <button class="btn btn-lg btn-primary btn-block" type="button" style="width: auto; background-color: black">{{ tap_phim.tap_thu }}</button>
+                    {% else %}
+                        <button class="btn btn-lg btn-primary btn-block" type="button" style="width: auto">{{ tap_phim.tap_thu }}</button>
+                    {% endif %}
+                </a></li>
+            {% endfor %}
+        {% endif %}
+    </ul>
+    <div class="row">
+        <div class="col-sm-10">
+            <h3>Nhận xét:</h3>
+            {% for comment in film.nhan_xet.all %}
+            <div class="media-body">
+                <div class="well well-lg">
+                <p>
+                    <h4 class="media-heading text-uppercase reviews"> {{ comment.user.first_name }} {{ comment.user.last_name }} </h4>
+                </p>
+                    <ul class="media-date text-uppercase reviews list-inline border-right">
+                        <li>{{ comment.ngay_dang }}</li>
+                    </ul>
+                    <p class="media-comment">
+                        {{ comment.noi_dung|linebreaks }}
+                    </p>
+                </div>
+            </div>
+            <br>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
