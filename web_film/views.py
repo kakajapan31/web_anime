@@ -40,7 +40,6 @@ class Film_view(generic.DetailView):
             film_now = self.get_object()
             film_now.luot_xem += 1
             film_now.save()
-            print(film_now.tap_phim_set.first().ma_tap)
             return redirect('film_page', film_now.tap_phim_set.first().ma_tap)
 
         if request.POST.get('noi_dung'):
@@ -266,4 +265,3 @@ class Question_view(generic.DetailView):
         else:
             messages.error(request, "Wrong answer :(")
             return redirect('question', pk)
-
