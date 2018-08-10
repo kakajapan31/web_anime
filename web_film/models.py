@@ -1,8 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-# Create your models here.
-
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
     id_correct_answer = models.IntegerField(default=0)

@@ -1,17 +1,13 @@
-from django.shortcuts import render
-
-# Create your views here.
-
 from django.views import generic
 from django.shortcuts import redirect
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 from django.contrib import  messages
 from django.contrib.auth.models import User
-from .models import Question, Choice
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from .models import *
 from .forms import CommentForm
+from rest_framework import generics
+from .serializers import *
 
 def logout(request):
     auth_logout(request)
@@ -75,14 +71,14 @@ class Actor_view(generic.DetailView):
         return context
 
 class Genre_view(generic.DetailView):
-     model = The_loai
-     template_name = 'web_film/genre.html'
-     context_object_name = 'genre'
+    model = The_loai
+    template_name = 'web_film/genre.html'
+    context_object_name = 'genre'
 
-     def get_context_data(self, **kwargs):
-         context = super().get_context_data(**kwargs)
-         context['list_film'] = Phim.objects.filter(the_loai__in=[self.object])
-         return context
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['list_film'] = Phim.objects.filter(the_loai__in=[self.object])
+        return context
 
 class Film_page_view(generic.DetailView):
     template_name = 'web_film/film_page.html'
@@ -238,30 +234,107 @@ class Forgot_password(generic.TemplateView):
             messages.error(request, "Your username or your email is wrong, try again!")
             return redirect('forgot_password')
 
+point = 0
 class Question_view(generic.DetailView):
     template_name = 'web_film/question.html'
     model = Question
-    context_object_name = 'question'
 
     def dispatch(self, request, pk):
+        global point
         if pk > Question.objects.count():
-            messages.error(request, "{}{}{}".format("I just have ", Question.objects.count(), " questions"))
-            return  redirect('index')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['count'] = Question.objects.count()
-        return context
+            messages.error(request, '{}{}{}{}{}'.format("I just have ", Question.objects.count(),
+                                                        " questions. You get ", point, " points"))
+            point = 0
+            return redirect('index')
+        return super().dispatch(request, pk)
 
     def post(self, request, pk):
+        global point
         id_answer = request.POST.get('choice', None)
         if id_answer is None:
             messages.info(request, "You must to choose an answer")
             return redirect('question', pk)
         id_correct_answer = Question.objects.get(pk=pk).id_correct_answer
         if int(id_answer) == int(id_correct_answer):
+            point += 10
             messages.success(request, "Correct!")
             return redirect('question', pk)
         else:
+            point -= 5
             messages.error(request, "Wrong answer :(")
             return redirect('question', pk)
+
+class Question_List_view(generics.ListCreateAPIView):
+    """This class defines the create behavior of our rest api."""
+    queryset = Question.objects.all()
+    serializer_class = Question_serializer
+
+    def perform_create(self, serializer):
+        """Save the post data when creating a new bucketlist."""
+        serializer.save()
+
+class Question_Detail_view(generics.RetrieveUpdateDestroyAPIView):
+    """This class handles the http GET, PUT and DELETE requests."""
+
+    queryset = Question.objects.all()
+    serializer_class = Question_serializer
+
+class Choice_List_of_Question(generics.ListCreateAPIView):
+    def get_queryset(self):
+        queryset = Choice.objects.filter(question=self.kwargs["pk"])
+        return queryset
+    serializer_class = Choice_serializer
+
+class Choice_Detail_of_Question(generics.ListCreateAPIView):
+    def get_queryset(self):
+        print(self.kwargs["pk"], self.kwargs["choice_pk"])
+        choice_set = Choice.objects.filter(question=self.kwargs["pk"])
+        print(choice_set[self.kwargs["choice_pk"]])
+        query_set = [choice_set[self.kwargs["choice_pk"]]]
+        return query_set
+    serializer_class = Choice_serializer
+
+class Film_List_view(generics.ListCreateAPIView):
+    queryset = Phim.objects.all()[:10]
+    serializer_class = Film_serializer
+
+class Film_Detail_view(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Phim.objects.all()
+    serializer_class = Film_serializer
+
+class Author_List_view(generics.ListCreateAPIView):
+    queryset = Dao_dien.objects.all()[:10]
+    serializer_class = Author_serializer
+
+class Author_Detail_view(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Dao_dien.objects.all()
+    serializer_class = Author_serializer
+
+class Actor_List_view(generics.ListCreateAPIView):
+    queryset = Dien_vien.objects.all()[:10]
+    serializer_class = Actor_serializer
+
+class Actor_Detail_view(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Dien_vien.objects.all()
+    serializer_class = Actor_serializer
+
+class Genre_List_view(generics.ListCreateAPIView):
+    queryset = The_loai.objects.all()[:10]
+    serializer_class = Genre_serializer
+
+class Genre_Detail_view(generics.RetrieveUpdateDestroyAPIView):
+    queryset = The_loai.objects.all()
+    serializer_class = Genre_serializer
+
+class Fitm_th_view(generics.ListCreateAPIView):
+    def get_queryset(self):
+        queryset = Tap_phim.objects.filter(phim=self.kwargs["pk"])
+        return queryset
+    serializer_class = Film_th_serializer
+
+class Film_th_Detail_of_Film(generics.RetrieveUpdateDestroyAPIView):
+    def get_queryset(self):
+        film_set = Tap_phim.objects.filter(phim=self.kwargs["pk"])
+        queryset = film_set.filter(tap_thu=self.kwargs["film_pk"])
+        return queryset
+    serializer_class = Film_th_serializer
