@@ -33,6 +33,8 @@ urlpatterns = [
     path('api/actor/<int:pk>/', views.Actor_Detail_view.as_view(), name='api_detail_actor'),
     path('api/genre/', views.Genre_List_view.as_view(), name='api_list_genre'),
     path('api/genre/<int:pk>/', views.Genre_Detail_view.as_view(), name='api_detail_genre'),
-    path('api/film/<int:pk>/list/', views.Fitm_th_view.as_view(), name='api_film_list'),
+    path('api/film/<int:pk>/list/', views.Fitm_th_List_view.as_view(), name='api_film_list'),
     path('api/film/<int:pk>/list/<int:film_pk>', views.Film_th_Detail_of_Film.as_view(), name='api_detail_filmth_i_of_film_j'),
+    path('api/film/<int:pk>/comments/', views.Comment_List_of_Film_view.as_view(), name='api_list_comment_of_film'),
+    path('api/film/<int:pk>/comments/<int:comment_pk>/', views.Comment_Detail_of_Film.as_view(), name='api_detail_comment_of_film')
 ]

@@ -326,7 +326,7 @@ class Genre_Detail_view(generics.RetrieveUpdateDestroyAPIView):
     queryset = The_loai.objects.all()
     serializer_class = Genre_serializer
 
-class Fitm_th_view(generics.ListCreateAPIView):
+class Fitm_th_List_view(generics.ListCreateAPIView):
     def get_queryset(self):
         queryset = Tap_phim.objects.filter(phim=self.kwargs["pk"])
         return queryset
@@ -338,3 +338,16 @@ class Film_th_Detail_of_Film(generics.RetrieveUpdateDestroyAPIView):
         queryset = film_set.filter(tap_thu=self.kwargs["film_pk"])
         return queryset
     serializer_class = Film_th_serializer
+
+class Comment_List_of_Film_view(generics.ListCreateAPIView):
+    def get_queryset(self):
+        queryset = Nhan_xet.objects.filter(phim=self.kwargs["pk"])
+        return queryset
+    serializer_class = Comment_serializer
+
+class Comment_Detail_of_Film(generics.RetrieveUpdateDestroyAPIView):
+    def get_queryset(self):
+        nhan_xet_set = Nhan_xet.objects.filter(phim=self.kwargs["pk"])
+        queryset = nhan_xet_set.filter(id=self.kwargs["comment_pk"])
+        return queryset
+    serializer_class = Comment_serializer
