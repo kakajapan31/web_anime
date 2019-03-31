@@ -1,7 +1,7 @@
 from django.views import generic
 from django.shortcuts import redirect
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
-from django.contrib import  messages
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -9,10 +9,12 @@ from .forms import CommentForm
 from rest_framework import generics
 from .serializers import *
 
+
 def logout(request):
     auth_logout(request)
     messages.info(request, "See you later!")
     return redirect('index')
+
 
 class Film_list_view(generic.ListView):
     template_name = 'web_film/index.html'
@@ -24,6 +26,7 @@ class Film_list_view(generic.ListView):
             query = self.request.GET['search']
             return Phim.objects.filter(ten_phim__icontains=query)
         return Phim.objects.all()[:8]
+
 
 class Film_view(generic.DetailView):
     model = Phim
@@ -50,6 +53,7 @@ class Film_view(generic.DetailView):
                 messages.error(request, "You have not comment!")
                 return redirect('film', pk)
 
+
 class Author_view(generic.DetailView):
     model = Dao_dien
     template_name = 'web_film/author.html'
@@ -59,6 +63,7 @@ class Author_view(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['list_film'] = Phim.objects.filter(dao_dien__in=[self.object])
         return context
+
 
 class Actor_view(generic.DetailView):
     model = Dien_vien
@@ -70,6 +75,7 @@ class Actor_view(generic.DetailView):
         context['list_film'] = Phim.objects.filter(dien_vien__in=[self.object])
         return context
 
+
 class Genre_view(generic.DetailView):
     model = The_loai
     template_name = 'web_film/genre.html'
@@ -79,6 +85,7 @@ class Genre_view(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context['list_film'] = Phim.objects.filter(the_loai__in=[self.object])
         return context
+
 
 class Film_page_view(generic.DetailView):
     template_name = 'web_film/film_page.html'
@@ -91,6 +98,7 @@ class Film_page_view(generic.DetailView):
         context['list_film'] = film.tap_phim_set.all().order_by('tap_thu')
         context['film'] = film
         return context
+
 
 @method_decorator(login_required, name='dispatch')
 class Help(generic.TemplateView):
@@ -108,8 +116,10 @@ class Help(generic.TemplateView):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+
 class About_me(generic.TemplateView):
     template_name = 'web_film/about_me.html'
+
 
 class Login(generic.TemplateView):
     template_name = 'web_film/login.html'
@@ -131,6 +141,7 @@ class Login(generic.TemplateView):
         if self.request.user.is_authenticated:
             return redirect('index')
         return super().dispatch(*args, **kwargs)
+
 
 class Register(generic.TemplateView):
     template_name = 'web_film/register.html'
@@ -169,6 +180,7 @@ class Register(generic.TemplateView):
             return redirect('index')
         return super().dispatch(*args, **kwargs)
 
+
 @method_decorator(login_required, name='dispatch')
 class My_account(generic.TemplateView):
     template_name = 'web_film/my_account.html'
@@ -176,6 +188,7 @@ class My_account(generic.TemplateView):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
+
 
 @method_decorator(login_required, name='dispatch')
 class Change_password(generic.TemplateView):
@@ -210,6 +223,7 @@ class Change_password(generic.TemplateView):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+
 class Forgot_password(generic.TemplateView):
     template_name = 'web_film/forgot_password.html'
 
@@ -234,7 +248,10 @@ class Forgot_password(generic.TemplateView):
             messages.error(request, "Your username or your email is wrong, try again!")
             return redirect('forgot_password')
 
+
 point = 0
+
+
 class Question_view(generic.DetailView):
     template_name = 'web_film/question.html'
     model = Question
@@ -264,6 +281,7 @@ class Question_view(generic.DetailView):
             messages.error(request, "Wrong answer :(")
             return redirect('question', pk)
 
+
 class Question_List_view(generics.ListCreateAPIView):
     """This class defines the create behavior of our rest api."""
     queryset = Question.objects.all()
@@ -273,17 +291,20 @@ class Question_List_view(generics.ListCreateAPIView):
         """Save the post data when creating a new bucketlist."""
         serializer.save()
 
+
 class Question_Detail_view(generics.RetrieveUpdateDestroyAPIView):
     """This class handles the http GET, PUT and DELETE requests."""
 
     queryset = Question.objects.all()
     serializer_class = Question_serializer
 
+
 class Choice_List_of_Question(generics.ListCreateAPIView):
     def get_queryset(self):
         queryset = Choice.objects.filter(question=self.kwargs["pk"])
         return queryset
     serializer_class = Choice_serializer
+
 
 class Choice_Detail_of_Question(generics.ListCreateAPIView):
     def get_queryset(self):
@@ -294,43 +315,53 @@ class Choice_Detail_of_Question(generics.ListCreateAPIView):
         return query_set
     serializer_class = Choice_serializer
 
+
 class Film_List_view(generics.ListCreateAPIView):
     queryset = Phim.objects.all()[:10]
     serializer_class = Film_serializer
+
 
 class Film_Detail_view(generics.RetrieveUpdateDestroyAPIView):
     queryset = Phim.objects.all()
     serializer_class = Film_serializer
 
+
 class Author_List_view(generics.ListCreateAPIView):
     queryset = Dao_dien.objects.all()[:10]
     serializer_class = Author_serializer
+
 
 class Author_Detail_view(generics.RetrieveUpdateDestroyAPIView):
     queryset = Dao_dien.objects.all()
     serializer_class = Author_serializer
 
+
 class Actor_List_view(generics.ListCreateAPIView):
     queryset = Dien_vien.objects.all()[:10]
     serializer_class = Actor_serializer
+
 
 class Actor_Detail_view(generics.RetrieveUpdateDestroyAPIView):
     queryset = Dien_vien.objects.all()
     serializer_class = Actor_serializer
 
+
 class Genre_List_view(generics.ListCreateAPIView):
     queryset = The_loai.objects.all()[:10]
     serializer_class = Genre_serializer
 
+
 class Genre_Detail_view(generics.RetrieveUpdateDestroyAPIView):
     queryset = The_loai.objects.all()
     serializer_class = Genre_serializer
+
 
 class Fitm_th_List_view(generics.ListCreateAPIView):
     def get_queryset(self):
         queryset = Tap_phim.objects.filter(phim=self.kwargs["pk"])
         return queryset
     serializer_class = Film_th_serializer
+
 
 class Film_th_Detail_of_Film(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
@@ -339,11 +370,13 @@ class Film_th_Detail_of_Film(generics.RetrieveUpdateDestroyAPIView):
         return queryset
     serializer_class = Film_th_serializer
 
+
 class Comment_List_of_Film_view(generics.ListCreateAPIView):
     def get_queryset(self):
         queryset = Nhan_xet.objects.filter(phim=self.kwargs["pk"])
         return queryset
     serializer_class = Comment_serializer
+
 
 class Comment_Detail_of_Film(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
